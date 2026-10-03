@@ -1,5 +1,6 @@
 from app.services.analyzer import analyze_messages
 from app.services.conflict_detector import detect_conflicts
+from app.schemas.response import AnalysisResponse
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from app.parsers.whatsapp import parse_whatsapp_chat
@@ -9,7 +10,7 @@ from app.parsers.discord import parse_discord_chat
 router = APIRouter(prefix="/api", tags=["Analysis"])
 
 
-@router.post("/analyze")
+@router.post("/analyze", response_model=AnalysisResponse)
 async def analyze_chats(
     whatsapp_file: UploadFile = File(...),
     discord_file: UploadFile = File(...),
@@ -29,17 +30,24 @@ async def analyze_chats(
     whatsapp_content = await whatsapp_file.read()
     discord_content = await discord_file.read()
 
-    whatsapp_text = whatsapp_content.decode("utf-8")
-    discord_text = discord_content.decode("utf-8")
+    try:
+        whatsapp_text = whatsapp_content.decode("utf-8")
+        discord_text = discord_content.decode("utf-8")
 
-    whatsapp_messages = parse_whatsapp_chat(whatsapp_text)
-    discord_messages = parse_discord_chat(discord_text)
+        whatsapp_messages = parse_whatsapp_chat(whatsapp_text)
+        discord_messages = parse_discord_chat(discord_text)
+
+    except (UnicodeDecodeError, ValueError, KeyError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid chat file: {str(e)}",
+        )
 
     all_messages = whatsapp_messages + discord_messages
 
     conversation_text = "\n".join(
-    f"[{message.platform}] {message.sender}: {message.message}"
-    for message in all_messages
+        f"[{message.platform}] {message.sender}: {message.message}"
+        for message in all_messages
     )
 
     project_facts = analyze_messages(conversation_text)
