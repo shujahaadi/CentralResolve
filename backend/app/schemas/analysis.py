@@ -12,6 +12,7 @@ class ProjectFact(BaseModel):
         "unresolved",
     ]
 
+    platform: Literal["whatsapp", "discord"]
     person: str
     task: str
     value: str

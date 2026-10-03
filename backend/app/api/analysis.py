@@ -37,7 +37,7 @@ async def analyze_chats(
     all_messages = whatsapp_messages + discord_messages
 
     conversation_text = "\n".join(
-    f"{message.sender}: {message.message}"
+    f"[{message.platform}] {message.sender}: {message.message}"
     for message in all_messages
     )
 

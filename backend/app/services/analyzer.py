@@ -23,6 +23,7 @@ For EVERY fact, return:
 - task: the task, work item, or subject associated with the fact
 - value: the actual information being stated
 - source_message: the COMPLETE original message that contains the fact
+- platform: exactly "whatsapp" or "discord", copied from the [whatsapp] or [discord] prefix on the message
 
 IMPORTANT RULES:
 
@@ -34,19 +35,24 @@ IMPORTANT RULES:
 6. Preserve the original meaning.
 7. If a fact does not clearly contain a person or task, use an empty string "".
 8. Extract multiple facts when multiple messages contain facts.
+9. Never infer the platform. Always use the platform tag provided in the message.
 
 Example:
 
 Input:
-Rahul: I'll handle deployment.
-Ahmed: Frontend will be done Sunday.
-Sana: The presentation deadline is Monday.
+[whatsapp] Rahul: I'll handle deployment.
+[whatsapp] Ahmed: Frontend will be done Sunday.
+[whatsapp] Sana: The presentation deadline is Monday.
+[discord] Rahul: I can't handle deployment anymore.
+[discord] Ahmed: Frontend is basically done.
+[discord] Sana: I thought the presentation was due Friday.
 
 Output:
 {
   "facts": [
     {
       "type": "task_assignment",
+      "platform": "whatsapp",
       "person": "Rahul",
       "task": "deployment",
       "value": "Rahul will handle deployment",
@@ -54,17 +60,11 @@ Output:
     },
     {
       "type": "deadline",
+      "platform": "whatsapp",
       "person": "Ahmed",
       "task": "frontend",
       "value": "Sunday",
       "source_message": "Ahmed: Frontend will be done Sunday."
-    },
-    {
-      "type": "deadline",
-      "person": "Sana",
-      "task": "presentation",
-      "value": "Monday",
-      "source_message": "Sana: The presentation deadline is Monday."
     }
   ]
 }
