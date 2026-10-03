@@ -1,3 +1,4 @@
+from app.services.analyzer import analyze_messages
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from app.parsers.whatsapp import parse_whatsapp_chat
@@ -35,8 +36,16 @@ async def analyze_chats(
 
     all_messages = whatsapp_messages + discord_messages
 
+    conversation_text = "\n".join(
+    f"{message.sender}: {message.message}"
+    for message in all_messages
+    )
+
+    project_facts = analyze_messages(conversation_text)
+
     return {
         "whatsapp_messages": len(whatsapp_messages),
         "discord_messages": len(discord_messages),
         "total_messages": len(all_messages),
+        "facts": project_facts.model_dump()["facts"],
     }
