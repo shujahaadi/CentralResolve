@@ -1,4 +1,5 @@
 from app.services.analyzer import analyze_messages
+from app.services.conflict_detector import detect_conflicts
 from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from app.parsers.whatsapp import parse_whatsapp_chat
@@ -42,10 +43,12 @@ async def analyze_chats(
     )
 
     project_facts = analyze_messages(conversation_text)
+    conflicts = detect_conflicts(project_facts.facts)
 
     return {
         "whatsapp_messages": len(whatsapp_messages),
         "discord_messages": len(discord_messages),
         "total_messages": len(all_messages),
         "facts": project_facts.model_dump()["facts"],
+        "conflicts": conflicts.model_dump()["conflicts"],
     }
