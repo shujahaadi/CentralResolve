@@ -4,56 +4,12 @@ import FileUpload from "./components/FileUpload";
 import StatCard from "./components/StatCard";
 import ConflictCard from "./components/ConflictCard";
 
-const MOCK_RESULTS = {
-  whatsapp_messages: 3,
-  discord_messages: 3,
-  total_messages: 6,
-  conflicts: [
-    {
-      type: "ownership_conflict",
-      task: "deployment",
-      description:
-        "Rahul was assigned to deployment, but later stated they could no longer handle it.",
-      severity: "high",
-      evidence: [
-        {
-          platform: "whatsapp",
-          message: "Rahul: I'll handle deployment.",
-        },
-        {
-          platform: "discord",
-          message: "Rahul: I can't handle deployment anymore.",
-        },
-      ],
-    },
-    {
-      type: "deadline_conflict",
-      task: "presentation",
-      description:
-        "Different deadlines were stated for presentation: monday, friday.",
-      severity: "high",
-      evidence: [
-        {
-          platform: "whatsapp",
-          message: "Sana: Presentation deadline is Monday.",
-        },
-        {
-          platform: "discord",
-          message: "Sana: I thought the presentation was due Friday.",
-        },
-      ],
-    },
-  ],
-};
-
-const USE_MOCK_ANALYSIS = false;
-
 function App() {
   const [whatsappFile, setWhatsappFile] = useState(null);
   const [discordFile, setDiscordFile] = useState(null);
   const [showUpload, setShowUpload] = useState(false);
 
-  const [results, setResults] = useState(MOCK_RESULTS);
+  const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -64,15 +20,6 @@ function App() {
 
     setLoading(true);
     setError("");
-
-    if (USE_MOCK_ANALYSIS) {
-      setTimeout(() => {
-        setResults(MOCK_RESULTS);
-        setLoading(false);
-      }, 800);
-
-      return;
-    }
 
     const formData = new FormData();
 
