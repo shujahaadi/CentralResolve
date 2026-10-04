@@ -1,5 +1,5 @@
 from app.schemas.analysis import ProjectFact
-from app.schemas.conflict import Conflict, Conflicts
+from app.schemas.conflict import Conflict, Conflicts, ConflictEvidence
 
 
 def normalize_deadline(value: str) -> str:
@@ -13,7 +13,6 @@ def detect_conflicts(facts: list[ProjectFact]) -> Conflicts:
     assignments = {}
     statuses = {}
 
-    
     for fact in facts:
         if fact.type == "task_assignment":
             key = fact.task.lower().strip()
@@ -62,7 +61,10 @@ def detect_conflicts(facts: list[ProjectFact]) -> Conflicts:
                         ),
                         severity="high",
                         evidence=[
-                            fact.source_message
+                            ConflictEvidence(
+                                platform=fact.platform,
+                                message=fact.source_message,
+                            )
                             for fact in person_facts
                         ],
                     )
@@ -78,7 +80,10 @@ def detect_conflicts(facts: list[ProjectFact]) -> Conflicts:
 
         if len(normalized_values) > 1:
             evidence = [
-                fact.source_message
+                ConflictEvidence(
+                    platform=fact.platform,
+                    message=fact.source_message,
+                )
                 for fact in task_facts
             ]
 
@@ -130,11 +135,14 @@ def detect_conflicts(facts: list[ProjectFact]) -> Conflicts:
                     ),
                     severity="medium",
                     evidence=[
-                        fact.source_message
+                        ConflictEvidence(
+                            platform=fact.platform,
+                            message=fact.source_message,
+                        )
                         for fact in task_facts
                     ],
                 )
-            )        
+            )
 
     # Unresolved decisions
     unresolved = {}
@@ -156,10 +164,13 @@ def detect_conflicts(facts: list[ProjectFact]) -> Conflicts:
                 ),
                 severity="medium",
                 evidence=[
-                    fact.source_message
+                    ConflictEvidence(
+                        platform=fact.platform,
+                        message=fact.source_message,
+                    )
                     for fact in task_facts
                 ],
             )
         )
-        
+
     return Conflicts(conflicts=conflicts)
