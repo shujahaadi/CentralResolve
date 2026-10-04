@@ -15,13 +15,13 @@ async def analyze_chats(
     whatsapp_file: UploadFile = File(...),
     discord_file: UploadFile = File(...),
 ):
-    if not whatsapp_file.filename.endswith(".txt"):
+    if not whatsapp_file.filename or not whatsapp_file.filename.lower().endswith(".txt"):
         raise HTTPException(
             status_code=400,
             detail="WhatsApp file must be a .txt file",
         )
 
-    if not discord_file.filename.endswith(".json"):
+    if not discord_file.filename or not discord_file.filename.lower().endswith(".json"):
         raise HTTPException(
             status_code=400,
             detail="Discord file must be a .json file",

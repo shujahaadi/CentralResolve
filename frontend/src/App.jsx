@@ -46,7 +46,7 @@ const MOCK_RESULTS = {
   ],
 };
 
-const USE_MOCK_ANALYSIS = true;
+const USE_MOCK_ANALYSIS = false;
 
 function App() {
   const [whatsappFile, setWhatsappFile] = useState(null);
